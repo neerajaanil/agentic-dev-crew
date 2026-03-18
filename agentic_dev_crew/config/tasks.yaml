@@ -1,0 +1,94 @@
+design_task:
+  description: >
+    Analyze the following requirements and produce a detailed technical design document.
+    Requirements: {requirements}
+    The design must cover: module overview, every class with its attributes (name + type),
+    every method and function with its signature (parameters, types, return type),
+    a description of what each does, and explicit notes on validation rules and edge cases.
+    IMPORTANT: Output ONLY Markdown. No code blocks containing Python — just the design doc.
+  expected_output: >
+    A Markdown design document containing:
+    - Module overview paragraph
+    - For each class: attribute table and method/function signatures with descriptions
+    - Explicit edge cases and validation rules
+    - Any external dependencies or helper functions required
+  agent: engineering_lead
+  output_file: output/{module_name}_design.md
+
+
+code_task:
+  description: >
+    Implement the design as a complete, production-quality Python module named {module_name}.
+    Primary class: {class_name}. Requirements: {requirements}
+    Follow the design exactly. Include type hints and docstrings on every public method.
+    The module must be self-contained and importable with no extra dependencies.
+    Before delivering your final answer, call the "Validate Python Syntax" tool with
+    your complete code and fix any issues it reports.
+  expected_output: >
+    A complete, working Python module implementing the design.
+    IMPORTANT: Output ONLY raw Python source code.
+    No markdown, no backticks, no code fences, no prose — just valid Python.
+  agent: backend_engineer
+  context:
+    - design_task
+  output_file: output/{module_name}
+
+
+frontend_task:
+  description: >
+    Write a Gradio demo UI saved as app.py. It must import the backend class from
+    {module_name} (assumed to be in the same directory) and expose all its features
+    through a clean, single-user Gradio interface.
+    Requirements for context: {requirements}
+    Keep it simple — this is a prototype, not a production app.
+  expected_output: >
+    A complete app.py file that runs with `python app.py` from the output/ directory.
+    IMPORTANT: Output ONLY raw Python source code.
+    No markdown, no backticks, no code fences, no prose — just valid Python.
+  agent: frontend_engineer
+  context:
+    - code_task
+  output_file: output/app.py
+
+
+test_task:
+  description: >
+    Write a comprehensive unittest suite for {module_name}. Cover every public method,
+    all success cases, all failure/error cases, and boundary/edge conditions.
+    Use setUp() to create test fixtures. Each test method should test exactly one thing.
+    Before delivering your final answer, call the "Validate Python Syntax" tool with
+    your complete test code and fix any issues it reports.
+  expected_output: >
+    A complete test_{{module_name}} file using Python's unittest framework.
+    IMPORTANT: Output ONLY raw Python source code.
+    No markdown, no backticks, no code fences, no prose — just valid Python.
+  agent: test_engineer
+  context:
+    - code_task
+  output_file: output/test_{module_name}
+
+
+review_task:
+  description: >
+    Conduct a thorough code review of the {module_name} implementation and its test suite.
+    Evaluate across these dimensions:
+    1. Correctness — does it fulfil all requirements?
+    2. Security — any unsafe operations, injection risks, or data exposure?
+    3. Python best practices — PEP 8, PEP 257, idiomatic patterns
+    4. Type safety — are type hints complete and accurate?
+    5. Error handling — are all failure modes handled gracefully?
+    6. Test quality — coverage completeness, test isolation, meaningful assertions
+    7. Performance — any obvious inefficiencies?
+    For each finding, state: Severity (Critical / Major / Minor / Suggestion), Location,
+    What the issue is, and a concrete Recommendation to fix it.
+  expected_output: >
+    A structured Markdown code review containing:
+    - Executive Summary (2-3 sentences on overall quality)
+    - Findings table (Severity | Location | Issue | Recommendation)
+    - Top 3 Recommendations section with expanded detail
+    - Verdict: Approve / Request Changes
+  agent: code_reviewer
+  context:
+    - code_task
+    - test_task
+  output_file: output/{module_name}_review.md
