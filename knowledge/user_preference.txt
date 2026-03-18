@@ -3,4 +3,3 @@ User prefers production-quality Python code with type hints, docstrings, and PEP
 User prefers comprehensive unit tests covering both happy paths and edge cases.
 User prefers simple, functional Gradio UIs that clearly demonstrate all backend capabilities.
 User values clean code, clear variable names, and minimal but meaningful inline comments.
-User is building a GitHub portfolio to showcase AI Engineering skills.
